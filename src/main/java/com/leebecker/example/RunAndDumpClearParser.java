@@ -35,18 +35,28 @@ public class RunAndDumpClearParser {
 		
 		File inputDir = options.inputDir;
 		
+		// Creates a collection reader that creates a CAS object for each file found in the input directory
+		// and sets the CAS's URI field to the file's URI path.
 		CollectionReader reader = CollectionReaderFactory.createCollectionReader(
 				UriCollectionReader.class, 
 				UriCollectionReader.PARAM_DIRECTORY,
 				inputDir);
 		
+		// Create a pipeline for parsing
 		AggregateBuilder pipeline = new AggregateBuilder();
+		// Reads text from URI field and populates view CAS.NAME_DEFAULT_SOFA
 		pipeline.add(UriToDocumentTextAnnotator.getDescription());
+		// Sentence segmentation
 		pipeline.add(SentenceAnnotator.getDescription());
+		// ClearNLP tokenizer
 		pipeline.add(Tokenizer.getDescription());
+		// ClearNLP POS tagger
 		pipeline.add(PosTagger.getDescription());
+		// ClearNLP Morphological Analyzer (aka lemmatizer)
 		pipeline.add(MPAnalyzer.getDescription());
+		// ClearNLP Dependency parser
 		pipeline.add(DependencyParser.getDescription());
+		// Simple analysis engine to dump parses
 		pipeline.add(DumpDependencyParsesAnnotator.getDescription());
 		
 		SimplePipeline.runPipeline(reader, pipeline.createAggregate());

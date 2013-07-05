@@ -33,17 +33,25 @@ public class RunAndDumpMaltParser {
 		
 		File inputDir = options.inputDir;
 		
+		// Creates a collection reader that creates a CAS object for each file found in the input directory
+		// and sets the CAS's URI field to the file's URI path.	
 		CollectionReader reader = CollectionReaderFactory.createCollectionReader(
 				UriCollectionReader.class, 
 				UriCollectionReader.PARAM_DIRECTORY,
 				inputDir);
 		
 		AggregateBuilder pipeline = new AggregateBuilder();
+		// Reads text from URI field and populates view CAS.NAME_DEFAULT_SOFA
 		pipeline.add(UriToDocumentTextAnnotator.getDescription());
+		// OpenNLP sentence segmenter
 		pipeline.add(SentenceAnnotator.getDescription());
+		// ClearTK's tokenizer
 		pipeline.add(TokenAnnotator.getDescription());
+		// OpenNLP POS tagger
 		pipeline.add(POSTagger.getDescription("en"));
+		// Malt Dependency Parser
 		pipeline.add(MaltParser.getDescription());
+		// Simple analysis engine to dump parses
 		pipeline.add(DumpDependencyParsesAnnotator.getDescription());
 		
 		SimplePipeline.runPipeline(reader, pipeline.createAggregate());
